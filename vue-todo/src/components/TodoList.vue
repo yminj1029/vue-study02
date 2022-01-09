@@ -1,8 +1,10 @@
 <template>
   <div>
       <ul>
-          <li v-for="(todoItem,index) in todoItems" v-bind:key="todoItem" class="shadow">
-              {{todoItem}}
+          <li v-for="(todoItem,index) in todoItems" v-bind:key="todoItem.item" class="shadow">
+            <i class="checkBtn fas fa-check" v-bind:class="{checkBtnCompleted:todoItem.completed}" 
+            v-on:click="toggleComplete(todoItem)"></i>
+            <span v-bind:class="{textCompleted:todoItem.completed}">{{todoItem.item}}</span>
               <span class="remobeBtn" v-on:click="removeTodo(todoItem, index)">
                   <i class="fas fa-trash"></i>
               </span>
@@ -22,13 +24,21 @@ export default {
         removeTodo:function(todoItem, index){
             localStorage.removeItem(todoItem);
             this.todoItems.splice(index, 1); //기존 배열 삭제
+        },
+        toggleComplete:function(todoItem){
+            todoItem.completed = !todoItem.completed;
+            localStorage.removeItem(todoItem.item);
+            localStorage.setItem(todoItem.item, JSON.stringify(todoItem))
         }
     },
     created:function(){
         if(localStorage.length >0){
             for(var i =0; i<localStorage.length; i++){
                 if(localStorage.key(i)!=='loglevel:webpack-dev-server'){
-                    this.todoItems.push(localStorage.key(i))
+                    this.todoItems.push(
+                        JSON.parse(localStorage.getItem(localStorage.key(i)))
+                    );
+                    // this.todoItems.push(localStorage.key(i))
                 }
             }
         }
@@ -36,7 +46,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 ul{
     list-style-type: none;
     padding-left: 0px;
@@ -65,5 +75,9 @@ li{
 }
 .checkBtnCompleted{
     color:#b3adad;
+}
+.textCompleted{
+    text-decoration: line-through;
+    color: #b3adad;
 }
 </style>
