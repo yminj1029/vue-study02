@@ -17,8 +17,30 @@ const storage = {
     return arr;
   },
 };
+
 export const store = new Vuex.Store({
   state: {
     todoItems: storage.fetch(),
+  },
+  mutations: {
+    addOneItem(state, todoItem) {
+      const obj = { completed: false, item: todoItem };
+      localStorage.setItem(todoItem, JSON.stringify(obj));
+      state.todoItems.push(obj);
+    },
+    removeOneItem(state, payload) {
+      localStorage.removeItem(payload.item);
+      state.todoItems.splice(payload, 1); //기존 배열 삭제
+    },
+    toggleOneItem(state, payload) {
+      state.todoItems[payload.index].completed =
+        !state.todoItems[payload.index].completed;
+      localStorage.removeItem(state.todoItems.item);
+      localStorage.setItem(payload.item, JSON.stringify(payload));
+    },
+    clearAllItem(state) {
+      localStorage.clear();
+      state.todoItems = [];
+    },
   },
 });
